@@ -1,53 +1,44 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
 
-// Function to swap two elements
-void swap(int &a, int &b) {
-    int temp = a;
-    a = b;
-    b = temp;
+void swap(int &a,int &b){
+    int temp=a;
+    a=b;
+    b=temp;
 }
+ int partition(int arr[],int strt,int end){
+    int pivot = arr[end];
+    int idx = strt-1;
 
-// Partition function: places pivot in correct position
-int partition(int arr[], int low, int high) {
-    int pivot = arr[high]; // Choose the last element as pivot
-    int i = low - 1;       // Index of smaller element
-
-    for (int j = low; j < high; j++) {
-        // If current element is smaller than or equal to pivot
-        if (arr[j] <= pivot) {
-            i++;
-            swap(arr[i], arr[j]); // Move smaller element to the left
+    for(int j=strt;j<end;j++){
+        if(arr[j]<=pivot){
+            idx++;
+            swap(arr[idx],arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]); // Place pivot at its correct position
-    return (i + 1);
-}
+    idx++;
+    swap(arr[idx],arr[end]);
+    return idx;
+ }
+ void quicksort(int arr[],int strt,int end){
 
-// Recursive Quick Sort function
-void quickSort(int arr[], int low, int high) {
-    if (low < high) {
-        // Partition the array
-        int pi = partition(arr, low, high);
+    if(strt<end){
+        int pi=partition(arr,strt,end);
 
-        // Recursively sort the two halves
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+        quicksort(arr,strt,pi-1);
+        quicksort(arr,pi+1,end);
     }
-}
-
-// Utility function to print an array
-void printArray(int arr[], int size) {
-    for (int i = 0; i < size; i++)
-        cout << arr[i] << " ";
-    cout << endl;
-}
-
-int main() {
-    int arr[] = {10, 7, 8, 9, 1, 5};
-    int n = sizeof(arr) / sizeof(arr[0]);
-    quickSort(arr, 0, n - 1);
-    cout << "Quick Sorted array: ";
-    printArray(arr, n);
+ }
+ void printarr(int arr[],int size){
+    for(int i=0;i<size;i++){
+        cout<< arr[i]<< " ";
+    }
+ }
+ int main(){
+    int arr[]={5,2,4,6,1,3};
+    int size= sizeof(arr)/sizeof(arr[0]);
+    quicksort(arr,0,size-1);
+    cout<< "sorted array: ";
+    printarr(arr,size);
     return 0;
-}
+ }
