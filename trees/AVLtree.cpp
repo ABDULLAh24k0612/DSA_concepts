@@ -1,179 +1,163 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
+ 
+class node{
 
-class Node{
-public:
-    int key;
-    Node *left;
-    Node *right;
-    int height;
-    Node(int k){
-        key = k;
-        left = nullptr;
-        right = nullptr;
-        height = 0; 
+	public:
+
+	node*right;
+	node*left;
+	int key;
+	int height;
+
+	node(int k){
+		node*left=nullptr;
+		node*right=nullptr;
+		key=k;
+		height=0;
     }
 };
+   
+  int height(node*n){
+      if(n==nullptr){
+		return -1;
+	  }
+	  return n->height;
+	}
 
-int height(Node *N)
-{
-    if (N == nullptr)
-        return -1;
-    return N->height;
-}
+  int getbalance(node*n){
+      if(n==nullptr){
+		return 0;
+	  }
+	  return height(n->left)-height(n->right);
+  }
 
-int getBalance(Node *N)
-{
-    if (N == nullptr)
-        return 0;
-    return height(N->left) - height(N->right);
-}
+  node*rightrotate(node*y){
 
-Node *rightRotate(Node *y)
-{
-    Node *x = y->left;
-    Node *T2 = x->right;
+	node*x=y->left;
+	node*t2=x->right;
 
-    x->right = y;
-    y->left = T2;
+	y->left=t2;
+	x->right=y;
 
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
+	y->height=max(height(y->left),height(y->right))+1;
+	x->height=max(height(x->left),height(x->right))+1;
+	return x;
+  }
 
-    return x;
-}
+  node*leftrotate(node*y){
 
-Node *leftRotate(Node *y)
-{
-    Node *x = y->right;
-    Node *T2 = x->left;
+	node*x=y->right;
+	node*t2=x->left;
 
-    x->left = y;
-    y->right = T2;
+	y->right=t2;
+	x->left=y;
 
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
+	y->height=max(height(y->left),height(y->right))+1;
+	x->height=max(height(x->left),height(x->right))+1;
+	return x;
+  }
 
-    return x;
-}
+  node*insert(node*root,int key){
+     if(root==nullptr){
+		node*newnode=new node(key);
+		return newnode;
+	 }
+	 if(key<root->key){
+		root->left=insert(root->left,key);
+	 }
+	 if(key>root->key){
+		root->right=insert(root->right,key);
+	 }
+	 return root;
 
-Node *insert(Node *node, int key)
-{
-    if (node == nullptr)
-    {
-        Node *newNode = new Node(key);
-        return newNode;
-    }
+	 root->height=max(height(root->left),height(root->right))+1;
+	 int balance=getbalance(root);
 
-    if (key < node->key)
-        node->left = insert(node->left, key);
-    else if (key > node->key)
-        node->right = insert(node->right, key);
-    else
-        return node;
+	 if(balance>1 && key<root->left->key){
+		return rightrotate(root);
+	 }
+	 if(balance<-1 && key>root->right->key){
+		return leftrotate(root);
+	 }
+	 if(balance>1 && key>root->left->key){
+		root->left=leftrotate(root->left);
+		return rightrotate(root);
+	 }
+	 if(balance<-1 && key<root->right->key){
+		root->right=rightrotate(root->right);
+		return leftrotate(root);
+	 }
+	 return root;
+  }
+  node*findmin(node*root){
+    node*temp=root;
+	while( temp &&temp->left!=nullptr){
+		temp=temp->left;
+	}
+	return temp;
+  }
+  node*deletenode(node*root,int key){
+	if(root==nullptr){
+		return;
+	}
+	if(key<root->key){
+		root->left=deletenode(root->left,key);
+	}
+	else if(key>root->key){
+		root->right=deletenode(root->right,key);
+	}
+	else{
+		if(root->left==nullptr){
+			node*temp=root->right;
+			delete root;
+			return temp;
+		}
+		else if(root->right==nullptr){
+			node*temp=root->left;
+			delete root;
+			return temp;
+		}
+		node*temp=findmin(root->right);
+		root->key=temp->key;
+		root->right=deletenode(root->right,temp->key);
+		}
+	if(root==nullptr){
+		return root;
+	}
+	root->height=max(height(root->left),height(root->right))+1;
+	int balance=getbalance(root);
 
-    node->height = 1 + max(height(node->left), height(node->right));
+	if(balance>1 && getbalance(root)>=0){
+		return rightrotate(root);
+	}
+	if(balance>1 && getbalance(root)<0){
+		root->left=leftrotate(root->left);
+		return rightrotate(root);
+	}
+	if(balance<-1 && getbalance(root)<=0){
+		return leftrotate(root);
+	}
+	if(balance<-1 && getbalance(root)>0){
+		root->right=rightrotate(root->right);
+		return leftrotate(root);
+	}
+	return root;
 
-    int balance = getBalance(node);
+  }
 
-    if (balance > 1 && key < node->left->key)
-        return rightRotate(node);
+  void inorderdisplay(node*root){
+	if(root==nullptr){
+		return;
+	}
+	inorderdisplay(root->left);
+	cout<<root->key<<" ";
+	inorderdisplay(root->right);
 
-    if (balance < -1 && key > node->right->key)
-        return leftRotate(node);
-
-    if (balance > 1 && key > node->left->key)
-    {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
-    }
-
-    if (balance < -1 && key < node->right->key)
-    {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
-    }
-
-    return node;
-}
-
-Node* findmin(Node* root){
-    Node* current = root;
-    while(current && current->left != NULL){
-        current = current->left;
-    }
-    return current;
-}
-
-Node* deleteNode(Node* root, int key)
-{
-    if (root == nullptr)
-        return root;
-
-    if (key < root->key)
-        root->left = deleteNode(root->left, key);
-
-    else if (key > root->key)
-        root->right = deleteNode(root->right, key);
-
-    else
-    {
-        if(root->left == NULL){
-            Node* temp = root->right;
-            delete root;
-            return temp;
-        }
-        else if(root->right == NULL){
-            Node* temp = root->left;
-            delete root;
-            return temp;
-        }
-
-        Node* temp = findmin(root->right);
-        root->key = temp->key;
-        root->right = deleteNode(root->right, temp->key);
-    }
-
-    if (root == nullptr)
-        return root;
-
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    int balance = getBalance(root);
-
-    if (balance > 1 && getBalance(root->left) >= 0)
-        return rightRotate(root);
-
-    if (balance > 1 && getBalance(root->left) < 0)
-    {
-        root->left = leftRotate(root->left);
-        return rightRotate(root);
-    }
-
-    if (balance < -1 && getBalance(root->right) <= 0)
-        return leftRotate(root);
-
-    if (balance < -1 && getBalance(root->right) > 0)
-    {
-        root->right = rightRotate(root->right);
-        return leftRotate(root);
-    }
-
-    return root;
-}
-
-void inorder(Node* root)
-{
-    if (root == nullptr)
-        return;
-    inorder(root->left);
-    cout << root->key << " ";
-    inorder(root->right);
-}
-
+  }
 int main()
 {
-    Node *root = nullptr;
+    node *root = nullptr;
 
     int keys[] = {10, 20, 30, 40, 50, 25};
 
@@ -183,8 +167,9 @@ int main()
     cout << "AVL Tree created with root key: " << root->key << endl;
 
     cout << "Inorder Traversal: ";
-    inorder(root);
+    inorderdisplay(root);
     cout << endl;
 
     return 0;
 }
+
