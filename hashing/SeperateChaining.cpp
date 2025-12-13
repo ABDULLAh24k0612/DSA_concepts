@@ -1,89 +1,85 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
 
-struct Node {
+struct node{
     int key;
-    Node* next;
+    node*next;
 };
 
-class HashTable {
-    int size;
-    Node** table;
+class separateChaining{
+    public:
 
-public:
-    HashTable(int s) {
-        size = s;
-        table = new Node*[size];
-        for (int i = 0; i < size; i++)
-            table[i] = NULL;
+    int size;
+    node**table;
+
+    separateChaining(int s){
+        size=s;
+        table=new node*[size];
+        for(int i=0;i<size;i++){
+            table[i]=NULL;
+        } 
     }
 
-    int hash(int key) {
+    int hash(int key){
         return key % size;
     }
 
-    void insertKey(int key) {
-        int index = hash(key);
-        Node* newNode = new Node{key, NULL};
+    void insert(int key){
+        int index=hash(key);
+        node*newnode=new node{key,NULL};
 
-        if (table[index] == NULL) {
-            table[index] = newNode;
-        } else {
-            newNode->next = table[index];
-            table[index] = newNode;
+        if(table[index]==NULL){
+            table[index]=newnode;
+        }
+        else{
+            newnode->next=table[index];
+            table[index]=newnode;
         }
     }
 
-    bool searchKey(int key) {
-        int index = hash(key);
-        Node* curr = table[index];
+    void deletekey(int key){
+        int index=hash(key);
+        node*curr=table[index];
+        node*prev=NULL;
 
-        while (curr) {
-            if (curr->key == key) return true;
-            curr = curr->next;
+        while(curr!=NULL){
+            if(curr->key==key){
+                if(prev==NULL){
+                    table[index]=curr->next;
+                }
+                else{
+                    prev->next=curr->next;
+                }
+                delete curr;
+                return;
+            }
+            prev=curr;
+            curr=curr->next;
+        }
+    }
+    bool searchkey(int key){
+        int index=hash(key);
+        node*curr=table[index];
+
+        while(curr!=NULL){
+            if(curr->key==key){
+                cout<< key<<"found"<< endl;
+                return true;
+            }
+            curr=curr->next;
         }
         return false;
     }
 
-    void deleteKey(int key) {
-        int index = hash(key);
-        Node* curr = table[index];
-        Node* prev = NULL;
-
-        while (curr) {
-            if (curr->key == key) {
-                if (prev == NULL)
-                    table[index] = curr->next;
-                else
-                    prev->next = curr->next;
-
-                delete curr;
-                return;
+    void display(){
+        for(int i=0;i<size;i++){
+            node*curr=table[i];
+            cout<<i<<":";
+            while(curr!=NULL){
+                cout<<curr->key<<"->";
+                curr=curr->next;
             }
-            prev = curr;
-            curr = curr->next;
-        }
-    }
-
-    void display() {
-        for (int i = 0; i < size; i++) {
-            cout << i << ": ";
-            Node* curr = table[i];
-            while (curr) {
-                cout << curr->key << " -> ";
-                curr = curr->next;
-            }
-            cout << "NULL\n";
+            cout<<"NULL"<<endl;
         }
     }
 };
-
-int main() {
-    HashTable h(10);
-
-    h.insertKey(12);
-    h.insertKey(22);
-    h.insertKey(32);
-
-    h.display();
-}
