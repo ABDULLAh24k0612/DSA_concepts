@@ -1,70 +1,63 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
 
-class LinearHash {
+class linearProbing{
+    public:
+
     int size;
-    int* table;
-    int EMPTY = -1;
-
-public:
-    LinearHash(int s) {
-        size = s;
-        table = new int[size];
-        for (int i = 0; i < size; i++)
-            table[i] = EMPTY;
+    int *table;
+    
+    linearProbing(int s){
+        size=s;
+        table=new int[size];
+        for(int i=0;i<size;i++){
+            table[i]=NULL;
+        } 
     }
-
-    int hash(int key) {
-        return key % size;
+    
+    int hash(int key){
+        return key%size;
     }
-
-    void insertKey(int key) {
-        int index = hash(key);
-
-        while (table[index] != EMPTY)
-            index = (index + 1) % size;
-
-        table[index] = key;
-    }
-
-    bool searchKey(int key) {
-        int index = hash(key);
-        int start = index;
-
-        while (table[index] != EMPTY) {
-            if (table[index] == key) return true;
-            index = (index + 1) % size;
-
-            if (index == start) return false;
+    void insert(int key){
+        int index=hash(key);
+        
+        for(int i=0;i<size;i++){
+            int newindex=(index+i)%size;
+            if(table[newindex]==NULL){
+                table[newindex]=key;
+                break;
+            }
         }
-        return false;
     }
+    
+    void deletekey(int key){
+        int index=hash(key);
 
-    void deleteKey(int key) {
-        int index = hash(key);
-        int start = index;
-
-        while (table[index] != EMPTY) {
-            if (table[index] == key) {
-                table[index] = EMPTY;
+        for(int i=0;i<size;i++){
+            int newindex=(index+i)%size;
+            if(table[newindex]==key){
+                table[newindex]=NULL;
                 return;
             }
-            index = (index + 1) % size;
-            if (index == start) return;
+        }
+        cout<< key<< "not found in the table"<<endl;
+    }
+
+    bool searchkey(int key){
+        int index=hash(key);
+
+        for(int i=0;i<size;i++){
+            int newindex=(index+i)%size;
+            if(table[newindex]==key){
+                return true;
+            }
+        }
+        cout<< key<< "not found in the table"<<endl;
+        return false;
+    }
+    void display(){
+        for(int i=0;i<size;i++){
+            cout<< i << ":"<< table[i]<<endl;
         }
     }
-
-    void display() {
-        for (int i = 0; i < size; i++)
-            cout << i << " : " << table[i] << endl;
-    }
 };
-
-int main() {
-    LinearHash h(10);
-    h.insertKey(12);
-    h.insertKey(22);
-    h.insertKey(32);
-
-    h.display();
-}
